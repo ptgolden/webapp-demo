@@ -26,6 +26,7 @@ module.exports = Backbone.View.extend({
     var url = 'http://bnb.data.bl.uk/search?object=' + query
       , ajaxOpts = { type: 'GET', url: url, context: this }
 
+    this.$results.html('Loading...');
     $.ajax(ajaxOpts)
       .then(this.parseSearchResultHtml)
       .then(this.renderResults, this.showError);
