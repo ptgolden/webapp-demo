@@ -1,0 +1,13 @@
+<h1>Resource: <%= resource.label %></h1>
+<p><a href="<%= resource._about %>" target="_blank">BNB Link</a></p>
+<h2>Resource type</h2>
+<ul>
+  <% resource.type.forEach(function (type) { %>
+  <li><%= type %></li>
+  <% }); %>
+</ul>
+
+<h3>Raw response</h3>
+<pre>
+<%= JSON.stringify(resource, true, '  ').replace(/"(http:[^"]+)/g, '"<a target="_blank" href="$1">$1</a>') %>
+</pre>
