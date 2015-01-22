@@ -22,6 +22,14 @@ module.exports = Backbone.View.extend({
     e.preventDefault();
     this.doSearch(q);
   },
+  doSearch: function (query) {
+    var url = 'http://bnb.data.bl.uk/search?object=' + query
+      , ajaxOpts = { type: 'GET', url: url, context: this }
+
+    $.ajax(ajaxOpts)
+      .then(this.parseSearchResultHtml)
+      .then(this.renderResults, this.showError);
+  },
   parseSearchResultHtml: function (html) {
     return $(html).find('.search-result a').toArray().map(function (el) {
       return {
@@ -39,12 +47,7 @@ module.exports = Backbone.View.extend({
       this.$results.html(resultsTemplate({ results: results }));
     }
   },
-  doSearch: function (query) {
-    var url = 'http://bnb.data.bl.uk/search?object=' + query
-
-    this.$results.html('Loading...');
-    $.get(url).then(this.parseSearchResultHtml).then(
-      this.renderResults.bind(this),
-      this.$results.html.bind(this.$results, 'Error loading results'));
+  showError: function () {
+    this.$results.html('Error loading results');
   }
 });
