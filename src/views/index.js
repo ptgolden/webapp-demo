@@ -14,42 +14,37 @@ module.exports = Backbone.View.extend({
     this.$results = this.$('#results');
   },
   render: function () {
-    var template = require('../templates/index.html')
+    var template = require('../templates/index.html');
     this.$el.html(template());
   },
   handleSubmit: function (e) {
     var q = e.target.search.value;
-
     e.preventDefault();
-
     this.doSearch(q);
   },
+  parseSearchResultHtml: function (html) {
+    return $(html).find('.search-result a').toArray().map(function (el) {
+      return {
+        title: el.textContent.trim(),
+        link: el.href
+      }
+    });
+  },
+  renderResults: function (results) {
+    var resultsTemplate = require('../templates/results.html');
+
+    if (!results.length) {
+      this.$results.html('No results for query "' + query + '"');
+    } else {
+      this.$results.html(resultsTemplate({ results: results }));
+    }
+  },
   doSearch: function (query) {
-    var that = this
-      , url = 'http://bnb.data.bl.uk/search?object=' + query
-      , resultsTemplate = require('../templates/results.html')
+    var url = 'http://bnb.data.bl.uk/search?object=' + query
 
     this.$results.html('Loading...');
-    $.get(url).then(
-      function (data) {
-        var results = $(data).find('.search-result a').toArray().map(function (el) {
-          return {
-            title: el.textContent.trim(),
-            link: el.href
-          }
-        });
-
-        if (!results.length) {
-          that.$results.html('No results for query "' + query + '"');
-        } else {
-          that.$results.html(resultsTemplate({ results: results }));
-        }
-
-
-      },
-      function () {
-        that.$results.html('Error loading results.');
-      }
-    )
+    $.get(url).then(this.parseSearchResultHtml).then(
+      this.renderResults.bind(this),
+      this.$results.html.bind(this.$results, 'Error loading results'));
   }
-})
+});
