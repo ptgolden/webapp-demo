@@ -29,7 +29,8 @@ module.exports = Backbone.View.extend({
     this.$results.html('Loading...');
     $.ajax(ajaxOpts)
       .then(this.parseSearchResultHtml)
-      .then(this.renderResults, this.showError);
+      .then(this.renderResults)
+      .catch(this.showError);
   },
   parseSearchResultHtml: function (html) {
     return $(html).find('.search-result a').toArray().map(function (el) {
